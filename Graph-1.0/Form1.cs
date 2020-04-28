@@ -8,8 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Collections;
 
-
-namespace Graph_1._0
+namespace Graph_1._1
 {
     public partial class Form1 : Form
     {
@@ -17,7 +16,6 @@ namespace Graph_1._0
         {
             InitializeComponent();
         }
-        //test
         public class Vertex
         {
             public bool wasVisited;
@@ -133,7 +131,7 @@ namespace Graph_1._0
                 return s;
             }
 
-      public void ClearGraph()
+            public void ClearGraph()
             {
                 for (int i = 0; i < NUM_VERTICES; i++)
                 {
@@ -289,7 +287,37 @@ namespace Graph_1._0
                 return s;
             }
 
-           
+            //Минимално свързващо дърво
+            public string MST()
+            {
+                vertices[0].wasVisited = true;
+                Stack gStack = new Stack();
+                gStack.Push(0);
+                int currVertex, v;
+                string s = "";
+                while (gStack.Count > 0)
+                {
+                    currVertex = (int)gStack.Peek();
+                    v = GetUnvisitedVertex(currVertex);
+                    if (v == -1)
+                    {
+                        gStack.Pop();
+                    }
+                    else
+                    {
+                        vertices[v].wasVisited = true;
+                        gStack.Push(v);
+                        s += ShowVertex(currVertex) + " => ";
+                        s += ShowVertex(v) + " ";
+                    }
+                }
+                for (int j = 0; j < numVerts; j++)
+                {
+                    vertices[j].wasVisited = false;
+                }
+
+                return s;
+            }
 
             public int NoSuccessors()
             {
@@ -313,6 +341,44 @@ namespace Graph_1._0
                 return -1;
             }
 
+            public void TopSort()
+            {
+                if (Count() <= 0)
+                {
+                    MessageBox.Show("TS - The graph is empty.");
+                    return;
+                }
+                Stack gStack = new Stack();
+
+                while (Count() > 0)
+                {
+                    int currVertex = NoSuccessors();
+                    if (currVertex == -1)
+                    {
+                        MessageBox.Show("TS - The graph has a loop.");
+                        return;
+                    }
+                    gStack.Push(vertices[currVertex].label);
+                    if (DelVertex(currVertex) == false)
+                    {
+                        MessageBox.Show("Error");
+                        return;
+                    }
+                }
+                string s = "Topological sort: \n";
+                while (gStack.Count > 0)
+                {
+                    if (gStack.Count > 1)
+                    {
+                        s += (gStack.Pop() + " -> ");
+                    }
+                    else
+                    {
+                        s += (gStack.Pop());
+                    }
+                }
+                MessageBox.Show(s);
+            }
         }
 
         Graph g = new Graph();
@@ -334,10 +400,9 @@ namespace Graph_1._0
                 g.AddVertex(element);
             }
         }
-
-        private void label2_Click(object sender, EventArgs e)
+        private void button12_Click(object sender, EventArgs e)
         {
-
+            Close();
         }
 
         private void btn1_Click(object sender, EventArgs e)
@@ -352,16 +417,6 @@ namespace Graph_1._0
             g.AddEdge(1, 5);
 
             richTextBox1.Text = g.ShowMatrix();
-        }
-
-        private void btnDFS_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("DFS: \n" + g.DFS());
-        }
-
-        private void btnBFS_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("BFS: \n" + g.BFS());
         }
 
         private void btnAddNode_Click(object sender, EventArgs e)
@@ -438,9 +493,83 @@ namespace Graph_1._0
             richTextBox1.Text = g.ShowMatrix();
         }
 
-        private void btnExit_Click(object sender, EventArgs e)
+        private void btnMatrix_Click(object sender, EventArgs e)
         {
-            Close();
+            if (g.Count() == 0)
+            {
+                MessageBox.Show("Empty");
+                return;
+            }
+            richTextBox1.Text = g.ShowMatrix();
+        }
+
+        private void btnDrop_Click(object sender, EventArgs e)
+        {
+            g.ClearGraph();
+            listBox1.Items.Clear();
+            listBox2.Items.Clear();
+            comboBox1.Items.Clear();
+            comboBox1.Text = "";
+            richTextBox1.Text = "";
+        }
+
+        private void btnTS_Click(object sender, EventArgs e)
+        {
+            g.TopSort();
+        }
+
+        private void btn2_Click(object sender, EventArgs e)
+        {
+            string[] items = new string[] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K" };
+            CreateGraph(items);
+            g.AddEdge(0, 1);
+            g.AddEdge(0, 2);
+            g.AddEdge(1, 3);
+            g.AddEdge(1, 4);
+            g.AddEdge(3, 7);
+            g.AddEdge(4, 8);
+            g.AddEdge(4, 9);
+            g.AddEdge(2, 5);
+            g.AddEdge(2, 6);
+            g.AddEdge(5, 10);
+
+            richTextBox1.Text = g.ShowMatrix();
+        }
+
+        private void btnDFS_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("DFS: \n" + g.DFS());
+        }
+
+        private void btnBFS_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("BFS: \n" + g.BFS());
+
+        }
+
+        private void btn3_Click(object sender, EventArgs e)
+        {
+            string[] items = new string[] { "A", "B", "C", "D", "E", "F", "G" };
+            CreateGraph(items);
+            g.AddEdge(0, 1); g.AddEdge(1, 0);
+            g.AddEdge(0, 2); g.AddEdge(2, 0);
+            g.AddEdge(0, 3); g.AddEdge(3, 0);
+            g.AddEdge(1, 3); g.AddEdge(3, 1);
+            g.AddEdge(1, 4); g.AddEdge(4, 1);
+            g.AddEdge(2, 5); g.AddEdge(5, 2);
+            g.AddEdge(3, 2); g.AddEdge(2, 3);
+            g.AddEdge(3, 4); g.AddEdge(4, 3);
+            g.AddEdge(3, 5); g.AddEdge(5, 3);
+            g.AddEdge(3, 6); g.AddEdge(6, 3);
+            g.AddEdge(4, 6); g.AddEdge(6, 4);
+            g.AddEdge(5, 6); g.AddEdge(6, 5);
+
+            richTextBox1.Text = g.ShowMatrix();
+        }
+
+        private void btnMST_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("MST: \n" + g.MST());
 
         }
     }
