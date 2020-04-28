@@ -17,7 +17,7 @@ namespace Graph_1._0
         {
             InitializeComponent();
         }
-
+        //test
         public class Vertex
         {
             public bool wasVisited;
